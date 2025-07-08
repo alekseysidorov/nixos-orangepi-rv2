@@ -47,28 +47,28 @@ in
       DRM_AMDGPU = no;
 
       # Reduce kernel size significantly
-      DEBUG_INFO = no;
-      DEBUG_KERNEL = no;
-      DEBUG_MISC = no;
+      DEBUG_INFO = lib.mkForce no;
+      DEBUG_KERNEL = lib.mkForce no;
+      DEBUG_MISC = lib.mkForce no;
 
       # Disable unneeded graphics drivers
-      DRM_RADEON = no;
-      DRM_I915 = no;
-      DRM_VMWGFX = no;
-      SOUND_OSS = no;
+      DRM_RADEON = lib.mkForce no;
+      DRM_I915 = lib.mkForce no;
+      DRM_VMWGFX = lib.mkForce no;
+      SOUND_OSS = lib.mkForce no;
 
       # Disable virtualization features to save space
-      KVM = no;
-      VIRTUALIZATION = no;
+      KVM = lib.mkForce no;
+      VIRTUALIZATION = lib.mkForce no;
 
       # Disable unneeded network protocols
-      IPX = no;
-      ATALK = no;
+      IPX = lib.mkForce no;
+      ATALK = lib.mkForce no;
 
       # Disable HID devices that aren't needed
-      HID_APPLE = no;
-      HID_LOGITECH = no;
-      HID_MICROSOFT = no;
+      HID_APPLE = lib.mkForce no;
+      HID_LOGITECH = lib.mkForce no;
+      HID_MICROSOFT = lib.mkForce no;
     };
 
     kernelPatches = [
