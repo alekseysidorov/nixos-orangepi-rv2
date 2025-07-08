@@ -11,26 +11,31 @@
     (modulesPath + "/installer/sd-card/sd-image.nix")
   ];
 
-  boot.loader.grub.enable = false;
-  boot.loader.generic-extlinux-compatible.enable = true;
+  boot = {
+    loader = {
+      grub.enable = false;
+      generic-extlinux-compatible.enable = true;
+    };
 
-  boot.consoleLogLevel = lib.mkDefault 7;
+    consoleLogLevel = lib.mkDefault 7;
 
-  boot.kernelParams = [
-    "console=tty1"
-    "console=ttyS0,115200"
-    "earlycon=sbi"
-    "boot.shell_on_fail"
-  ];
+    kernelParams = [
+      "console=tty1"
+      "console=ttyS0,115200"
+      "earlycon=sbi"
+      "boot.shell_on_fail"
+    ];
 
-  boot.kernelPackages = pkgs.linuxPackages_orangepi_ky;
+    kernelPackages = pkgs.linuxPackages_orangepi_ky;
 
-  boot.kernelModules = [ "bcmdhd" ]; # wifi
-  boot.blacklistedKernelModules = [ "onboard_usb_hub" ]; # breaks usb boot
+    kernelModules = [ "bcmdhd" ]; # wifi
+    blacklistedKernelModules = [ "onboard_usb_hub" ]; # breaks usb boot
 
-  boot.initrd.availableKernelModules = [ "nvme" ];
-
-  boot.initrd.extraFirmwarePaths = [ "esos.elf" ];
+    initrd = {
+      availableKernelModules = [ "nvme" ];
+      extraFirmwarePaths = [ "esos.elf" ];
+    };
+  };
 
   hardware.firmware = [ pkgs.esos-elf-firmware pkgs.ap6256-firmware ];
 
@@ -42,6 +47,9 @@
       makeModulesClosure = x: super.makeModulesClosure (x // { allowMissing = true; });
     })
   ];
+
+  # Enable installation of redistributable firmware packages
+  hardware.enableRedistributableFirmware = true;
 
   system.stateVersion = lib.mkDefault lib.trivial.release;
 
