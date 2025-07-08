@@ -40,12 +40,6 @@
     (self: super: {
       # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
       makeModulesClosure = x: super.makeModulesClosure (x // { allowMissing = true; });
-
-      esos-elf-firmware = self.callPackage ./esos-elf-firmware.nix { };
-
-      ap6256-firmware = self.callPackage ./ap6256-firmware.nix { };
-
-      linuxPackages_orangepi_ky = self.linuxPackagesFor (self.callPackage ./linux-orangepi-ky.nix { });
     })
   ];
 
