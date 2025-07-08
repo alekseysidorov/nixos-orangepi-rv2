@@ -41,20 +41,20 @@
             formatting = treefmt.config.build.check self;
           };
 
-          packages = {
+          packages = rec {
             # Main installer
-            installer = (pkgs.nixos ({
+            sd-image = (pkgs.nixos {
               imports = [
                 ./sd-images/sd-image-orangepi-rv2-installer.nix
               ];
-            })).config.system.build.sdImage;
+            }).config.system.build.sdImage;
 
             # Export individual packages
             linux-orangepi-ky = pkgs.linux-orangepi-ky;
             ap6256-firmware = pkgs.ap6256-firmware;
             esos-elf-firmware = pkgs.esos-elf-firmware;
 
-            default = self.packages.${system}.installer;
+            default = sd-image;
           };
         }
       ) // {
