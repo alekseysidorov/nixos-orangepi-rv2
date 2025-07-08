@@ -14,15 +14,13 @@
     let
       # Export overlay for use in other flakes
       overlay = import ./default.nix;
-
       # Systems that can be used to build
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" "aarch64-linux" ];
-
       # Always cross-compile to riscv64, regardless of host system
-      nixpkgsFor = system: import nixpkgs {
-        inherit system;
-        crossSystem = { system = "riscv64-linux"; };
-        config.allowUnfree = true;
+      crossSystem = "riscv64-linux";
+      nixpkgsFor = localSystem: import nixpkgs {
+        inherit localSystem crossSystem;
+
         overlays = [ overlay ];
       };
     in
