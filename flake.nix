@@ -14,23 +14,22 @@
     let
       # Export overlay for use in other flakes
       overlay = import ./default.nix;
-      # Systems that can be used to build
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" "aarch64-linux" ];
-      # Always cross-compile to riscv64, regardless of host system
-      crossSystem = "riscv64-linux";
-      nixpkgsFor = localSystem: import nixpkgs {
-        inherit localSystem crossSystem;
-
-        overlays = [ overlay ];
-      };
     in
-    flake-utils.lib.eachSystem supportedSystems
-      (system:
+    flake-utils.lib.eachDefaultSystem
+      (localSystem:
         let
+          # Always cross-compile to riscv64, regardless of host system
+          crossSystem = "riscv64-linux";
           # Use the host system to cross-compile to riscv64
-          pkgs = nixpkgsFor system;
-          # Add treefmt formatter
-          treefmt = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+          pkgs = import nixpkgs {
+            inherit localSystem crossSystem;
+
+            overlays = [ overlay ];
+          };
+
+          # Add treefmt formatter.
+          localPkgs = import nixpkgs { inherit localSystem; };
+          treefmt = treefmt-nix.lib.evalModule localPkgs ./treefmt.nix;
         in
         {
           # Formatter for `nix fmt`
