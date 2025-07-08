@@ -7,18 +7,8 @@
   };
 
   # Конфигурация Nix для этого flake
-  nixConfig = {
-    extra-substituters = [
-      "https://cache.nixos.org"
-      "https://cache.ztier.in" # cache from hydra-riscv64 project
-    ];
-    extra-trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM="
-    ];
-    keep-outputs = true;
-    keep-derivations = true;
-  };
+  # Конфигурация Nix передается через CLI аргументы
+  # для избежания проблем с безопасностью и доверием
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "riscv64-linux" ] (system:
@@ -32,8 +22,6 @@
           crossSystem = crossSystem;
           config = {
             allowUnfree = true;
-            # Оптимизации для сборки
-            permittedInsecurePackages = [ "openssl-1.1.1w" ];
           };
         };
 
@@ -45,20 +33,6 @@
             imports = [
               ./sd-image-orangepi-rv2-installer.nix
             ];
-
-            # Конфигурации специфичные для сборки
-            nixpkgs.config.allowUnfree = true;
-            nix.settings = {
-              max-jobs = "auto";
-              cores = 0;
-              sandbox = true;
-              extra-sandbox-paths = [ "/bin/sh=/bin/sh" ];
-              substituters = [ "https://cache.nixos.org" "https://cache.ztier.in" ];
-              trusted-public-keys = [
-                "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-                "cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM="
-              ];
-            };
           })).config.system.build.sdImage;
 
           default = self.packages.${system}.installer;
