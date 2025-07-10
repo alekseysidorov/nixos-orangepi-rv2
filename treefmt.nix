@@ -6,4 +6,5 @@
 
   programs.nixpkgs-fmt.enable = true;
   programs.beautysh.enable = true;
+  programs.deno.enable = true;
 }

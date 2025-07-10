@@ -43,7 +43,6 @@
         {
           # Formatter for `nix fmt`
           formatter = treefmt.config.build.wrapper;
-
           # Checker for `nix flake check`
           checks = {
             formatting = treefmt.config.build.check self;
@@ -62,6 +61,23 @@
                 ./sd-images/sd-image-orangepi-rv2-installer.nix
               ];
             }).config.system.build.sdImage;
+
+            # Simple script for pushing to Attic dev cache (filters out nixos paths)
+            attic-push-dev = pkgsLocal.writeScriptBin "attic-push-dev" ''
+              #!/${pkgsLocal.runtimeShell}
+
+              DERIVATION="./result"
+              CACHE="dev"
+
+              if [ ! -e "$DERIVATION" ]; then
+                echo "Error: Path $DERIVATION does not exist" >&2
+                exit 1
+              fi
+
+              echo "Pushing $DERIVATION to dev cache (excluding nixos paths)..."
+              nix-store -qR --include-outputs "$DERIVATION" | grep -v "nixos" | attic push "$CACHE" --stdin
+              echo "Done!"
+            '';
 
             default = sd-image-cross;
           };
