@@ -8,4 +8,7 @@ final: prev: {
   # Kernel packages
   linux-orangepi-ky = final.callPackage ./pkgs/linux/linux-orangepi-ky.nix { };
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
+
+  # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
+  makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 }
