@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
@@ -19,17 +19,23 @@
       (localSystem:
         let
           # Always cross-compile to riscv64, regardless of host system
-          crossSystem = "riscv64-linux";
+          crossSystem = { system = "riscv64-linux"; };
           # Use the host system to cross-compile to riscv64
-          pkgs = import nixpkgs {
+          pkgsCross = import nixpkgs {
             inherit localSystem crossSystem;
-
+            config.allowUnfree = true;
+            overlays = [ overlay ];
+          };
+          # Use native riscv64-linux system for building packages.
+          pkgsNative = import nixpkgs {
+            system = "riscv64-linux";
+            config.allowUnfree = true;
             overlays = [ overlay ];
           };
 
           # Add treefmt formatter.
-          localPkgs = import nixpkgs { inherit localSystem; };
-          treefmt = treefmt-nix.lib.evalModule localPkgs ./treefmt.nix;
+          pkgsLocal = import nixpkgs { inherit localSystem; };
+          treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
         in
         {
           # Formatter for `nix fmt`
@@ -41,19 +47,20 @@
           };
 
           packages = rec {
-            # Main installer
-            sd-image = (pkgs.nixos {
+            # Main installer in cross compile mode
+            sd-image-cross = (pkgsCross.nixos {
+              imports = [
+                ./sd-images/sd-image-orangepi-rv2-installer.nix
+              ];
+            }).config.system.build.sdImage;
+            # Main installer in native compile mode
+            sd-image-native = (pkgsNative.nixos {
               imports = [
                 ./sd-images/sd-image-orangepi-rv2-installer.nix
               ];
             }).config.system.build.sdImage;
 
-            # Export individual packages
-            linux-orangepi-ky = pkgs.linux-orangepi-ky;
-            ap6256-firmware = pkgs.ap6256-firmware;
-            esos-elf-firmware = pkgs.esos-elf-firmware;
-
-            default = sd-image;
+            default = sd-image-cross;
           };
         }
       ) // {

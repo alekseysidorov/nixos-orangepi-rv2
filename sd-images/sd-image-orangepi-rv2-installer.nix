@@ -27,7 +27,6 @@
     ];
 
     kernelPackages = pkgs.linuxPackages_orangepi_ky;
-
     kernelModules = [ "bcmdhd" ]; # wifi
     blacklistedKernelModules = [ "onboard_usb_hub" ]; # breaks usb boot
 
@@ -37,21 +36,17 @@
     };
   };
 
-  hardware.firmware = [ pkgs.esos-elf-firmware pkgs.ap6256-firmware ];
-
+  hardware.firmware = with pkgs; [ esos-elf-firmware ap6256-firmware ];
   hardware.deviceTree.name = "ky/x1_orangepi-rv2.dtb";
-
-  nixpkgs.overlays = [
-    (self: super: {
-      # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
-      makeModulesClosure = x: super.makeModulesClosure (x // { allowMissing = true; });
-    })
-  ];
 
   # Enable installation of redistributable firmware packages
   hardware.enableRedistributableFirmware = true;
 
   system.stateVersion = lib.mkDefault lib.trivial.release;
+
+  networking.networkmanager = {
+    # enable = true;
+  };
 
   sdImage = {
     populateFirmwareCommands = "";
