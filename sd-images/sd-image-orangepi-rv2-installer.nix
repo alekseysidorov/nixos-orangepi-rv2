@@ -45,8 +45,10 @@
   system.stateVersion = lib.mkDefault lib.trivial.release;
 
   networking.networkmanager = {
-    # enable = true;
+    enable = true;
+    plugins = lib.mkForce []; # Disable all plugins
   };
+  networking.wireless.enable = false;
 
   sdImage = {
     populateFirmwareCommands = "";
