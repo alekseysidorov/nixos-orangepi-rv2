@@ -17,7 +17,7 @@
       generic-extlinux-compatible.enable = true;
     };
 
-    consoleLogLevel = lib.mkDefault 7;
+    consoleLogLevel = lib.mkDefault 6;
 
     kernelParams = [
       "console=tty1"
@@ -46,7 +46,7 @@
 
   networking.networkmanager = {
     enable = true;
-    plugins = lib.mkForce []; # Disable all plugins
+    plugins = lib.mkForce [ ]; # Disable all plugins
   };
   networking.wireless.enable = false;
 
