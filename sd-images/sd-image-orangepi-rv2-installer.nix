@@ -17,7 +17,7 @@
       generic-extlinux-compatible.enable = true;
     };
 
-    consoleLogLevel = lib.mkDefault 6;
+    consoleLogLevel = lib.mkDefault 5;
 
     kernelParams = [
       "console=tty1"
@@ -36,7 +36,7 @@
     };
   };
 
-  hardware.firmware = with pkgs; [ esos-elf-firmware ap6256-firmware ];
+  hardware.firmware = with pkgs; [ esos-elf-firmware orangepi-xunlong-firmware ];
   hardware.deviceTree.name = "ky/x1_orangepi-rv2.dtb";
 
   # Enable installation of redistributable firmware packages
@@ -44,11 +44,12 @@
 
   system.stateVersion = lib.mkDefault lib.trivial.release;
 
-  networking.networkmanager = {
-    enable = true;
-    plugins = lib.mkForce [ ]; # Disable all plugins
-  };
-  networking.wireless.enable = false;
+  # TODO Discover why networkmanager doesn't work.
+  # networking.networkmanager = {
+  #   enable = true;
+  #   plugins = lib.mkForce [ ]; # Disable all plugins
+  # };
+  # networking.wireless.enable = false;
 
   sdImage = {
     populateFirmwareCommands = "";

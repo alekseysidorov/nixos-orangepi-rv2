@@ -63,11 +63,11 @@
             }).config.system.build.sdImage;
 
             # Simple script for pushing to Attic dev cache (filters out nixos paths)
-            attic-push-dev = pkgsLocal.writeScriptBin "attic-push-dev" ''
+            attic-cache-push = pkgsLocal.writeScriptBin "attic-push-dev" ''
               #!/${pkgsLocal.runtimeShell}
 
               DERIVATION="./result"
-              CACHE="dev"
+              CACHE="riscv64"
 
               if [ ! -e "$DERIVATION" ]; then
                 echo "Error: Path $DERIVATION does not exist" >&2
