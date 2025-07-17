@@ -24,10 +24,6 @@ stdenv.mkDerivation {
     cp -a * $out/lib/firmware/
     rm -f $out/lib/firmware/README.md
 
-    # Copy CLM file for 43456 from brcmfmac43455.
-    cp $out/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob $out/lib/firmware/clm_bcm43456c5_ag.blob
-    cp $out/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob $out/lib/firmware/brcm/brcmfmac43456-sdio.clm_blob
-
     runHook postInstall
   '';
 

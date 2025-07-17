@@ -39,6 +39,33 @@
           # Add treefmt formatter.
           pkgsLocal = import nixpkgs { inherit localSystem; };
           treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
+
+          mkSdImageFor = pkgs:
+            let
+              sdImage = (pkgs.nixos {
+                imports = [
+                  ./sd-images/sd-image-orangepi-rv2-installer.nix
+                ];
+              }).config.system.build.sdImage;
+            in
+            pkgsLocal.stdenv.mkDerivation {
+              name = "sd-image-orangepi-rv2.img.zst";
+              version = "1.0.0";
+              src = sdImage;
+
+              phases = [ "installPhase" ];
+              noAuditTmpdir = true;
+              preferLocalBuild = true;
+
+              installPhase = "ln -s $src/sd-image/*.img.zst $out";
+            };
+
+          mkFlashCommandFor = sdImage:
+            pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
+              #!/${pkgsCross.runtimeShell}
+              set -euo pipefail
+              "${pkgsLocal.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
+            '';
         in
         {
           # Formatter for `nix fmt`
@@ -50,17 +77,11 @@
 
           packages = rec {
             # Main installer in cross compile mode
-            sd-image-cross = (pkgsCross.nixos {
-              imports = [
-                ./sd-images/sd-image-orangepi-rv2-installer.nix
-              ];
-            }).config.system.build.sdImage;
+            sd-image = mkSdImageFor pkgsCross;
+            # Flash script for the cross-compiled image
+            flash-sd-image = mkFlashCommandFor sd-image;
             # Main installer in native compile mode
-            sd-image-native = (pkgsNative.nixos {
-              imports = [
-                ./sd-images/sd-image-orangepi-rv2-installer.nix
-              ];
-            }).config.system.build.sdImage;
+            sd-image-native = mkSdImageFor pkgsNative;
 
             # Simple script for pushing to Attic dev cache (filters out nixos paths)
             attic-cache-push = pkgsLocal.writeScriptBin "attic-push-dev" ''
@@ -79,7 +100,7 @@
               echo "Done!"
             '';
 
-            default = sd-image-cross;
+            default = sd-image;
           };
         }
       ) // {

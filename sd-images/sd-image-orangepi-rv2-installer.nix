@@ -9,6 +9,10 @@
     (modulesPath + "/profiles/base.nix")
     (modulesPath + "/profiles/installation-device.nix")
     (modulesPath + "/installer/sd-card/sd-image.nix")
+    # Settings for Orange Pi RV2
+    ./../modules/nix-settings.nix
+    ./../modules/audio.nix
+    ./../modules/graphics.nix
   ];
 
   boot = {
@@ -44,12 +48,16 @@
 
   system.stateVersion = lib.mkDefault lib.trivial.release;
 
-  # TODO Discover why networkmanager doesn't work.
-  # networking.networkmanager = {
-  #   enable = true;
-  #   plugins = lib.mkForce [ ]; # Disable all plugins
-  # };
-  # networking.wireless.enable = false;
+  networking.wireless.enable = false;
+  networking.networkmanager = {
+    enable = true;
+    wifi = {
+      # For unknown reasons, the Orange Pi RV2 wifi driver does not work with custom MAC addresses.
+      macAddress = "preserve";
+      scanRandMacAddress = false;
+    };
+    plugins = lib.mkForce [ ]; # Disable all plugins
+  };
 
   sdImage = {
     populateFirmwareCommands = "";

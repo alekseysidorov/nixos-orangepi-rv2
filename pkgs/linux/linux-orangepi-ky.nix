@@ -1,5 +1,4 @@
 # works: boot from nvme (bottom slot), boot from usb (blue ones)
-# doesn't work: wifi
 { lib
 , buildPackages
 , buildLinux
