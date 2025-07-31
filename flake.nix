@@ -40,7 +40,7 @@
           pkgsLocal = import nixpkgs { inherit localSystem; };
           treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
 
-          mkSdImageFor = pkgs:
+          mkSdImageInstallerFor = pkgs:
             let
               sdImage = (pkgs.nixos {
                 imports = [
@@ -77,11 +77,11 @@
 
           packages = rec {
             # Main installer in cross compile mode
-            sd-image = mkSdImageFor pkgsCross;
+            sd-image-installer = mkSdImageInstallerFor pkgsCross;
             # Flash script for the cross-compiled image
-            flash-sd-image = mkFlashCommandFor sd-image;
+            flash-sd-image-installer = mkFlashCommandFor sd-image-installer;
             # Main installer in native compile mode
-            sd-image-native = mkSdImageFor pkgsNative;
+            sd-image-native = mkSdImageInstallerFor pkgsNative;
 
             # Simple script for pushing to Attic dev cache (filters out nixos paths)
             attic-cache-push = pkgsLocal.writeScriptBin "attic-push-dev" ''
@@ -100,7 +100,7 @@
               echo "Done!"
             '';
 
-            default = sd-image;
+            default = sd-image-installer;
           };
         }
       ) // {

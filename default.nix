@@ -9,6 +9,11 @@ final: prev: {
   linux-orangepi-ky = final.callPackage ./pkgs/linux/linux-orangepi-ky.nix { };
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
 
+  # Mesa override to include PowerVR (imagination) driver
+  mesa = prev.mesa.override {
+    vulkanDrivers = prev.mesa.vulkanDrivers ++ [ "imagination-experimental" ];
+  };
+
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 }
