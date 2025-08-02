@@ -1,6 +1,11 @@
 { lib, pkgs, ... }:
 
 {
+  # Some common tweaks for nix packages
+  nixpkgs = {
+    overlays = [ import ./.. ];
+  };
+
   boot = {
     loader = {
       grub.enable = false;
