@@ -26,11 +26,15 @@
     };
   };
 
+  # Wifi driver doesn't support custom MAC addresses.
+  networking.networkmanager.wifi.scanRandMacAddress = lib.mkDefault false;
+
   hardware = {
-    firmware = with pkgs; [ esos-elf-firmware orangepi-xunlong-firmware ];
-    deviceTree = {
-      name = "ky/x1_orangepi-rv2.dtb";
-    };
-    enableRedistributableFirmware = true;
+    enableRedistributableFirmware = lib.mkDefault true;
+    firmware = with pkgs; [
+      esos-elf-firmware
+      orangepi-xunlong-firmware
+    ];
+    deviceTree.name = "ky/x1_orangepi-rv2.dtb";
   };
 }
