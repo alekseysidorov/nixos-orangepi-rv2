@@ -50,8 +50,14 @@
             default = sd-image-installer;
           };
         }
-      ) // {
+      )
+    # System independent modules.
+    // {
       # Export overlay for use in other projects
       overlays.default = overlay;
+      # All nixOS modules are kept here
+      nixosModules = {
+        boot = import ./modules/boot.nix;
+      };
     };
 }
