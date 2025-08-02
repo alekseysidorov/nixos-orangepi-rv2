@@ -40,32 +40,6 @@
           pkgsLocal = import nixpkgs { inherit localSystem; };
           treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
 
-          mkSdImageInstallerFor = pkgs:
-            let
-              sdImage = (pkgs.nixos {
-                imports = [
-                  ./sd-images/sd-image-orangepi-rv2-installer.nix
-                ];
-              }).config.system.build.sdImage;
-            in
-            pkgsLocal.stdenv.mkDerivation {
-              name = "sd-image-orangepi-rv2.img.zst";
-              version = "1.0.0";
-              src = sdImage;
-
-              phases = [ "installPhase" ];
-              noAuditTmpdir = true;
-              preferLocalBuild = true;
-
-              installPhase = "ln -s $src/sd-image/*.img.zst $out";
-            };
-
-          mkFlashCommandFor = sdImage:
-            pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
-              #!/${pkgsCross.runtimeShell}
-              set -euo pipefail
-              "${pkgsLocal.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
-            '';
         in
         {
           # Formatter for `nix fmt`
@@ -77,11 +51,11 @@
 
           packages = rec {
             # Main installer in cross compile mode
-            sd-image-installer = mkSdImageInstallerFor pkgsCross;
+            sd-image-installer = pkgsCross.sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
             # Flash script for the cross-compiled image
-            flash-sd-image-installer = mkFlashCommandFor sd-image-installer;
+            flash-sd-image-installer = pkgsCross.sdImageUtils.makeFlashCommand sd-image-installer;
             # Main installer in native compile mode
-            sd-image-native = mkSdImageInstallerFor pkgsNative;
+            sd-image-installer-native = pkgsNative.sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
 
             # Simple script for pushing to Attic dev cache (filters out nixos paths)
             attic-cache-push = pkgsLocal.writeScriptBin "attic-push-dev" ''

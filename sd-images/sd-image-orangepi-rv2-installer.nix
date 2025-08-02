@@ -9,10 +9,6 @@
     (modulesPath + "/profiles/base.nix")
     (modulesPath + "/profiles/installation-device.nix")
     (modulesPath + "/installer/sd-card/sd-image.nix")
-    # Settings for Orange Pi RV2
-    ./../modules/nix-settings.nix
-    ./../modules/audio.nix
-    ./../modules/graphics.nix
   ];
 
   boot = {
