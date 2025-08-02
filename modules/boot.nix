@@ -28,6 +28,7 @@
 
   # Wifi driver doesn't support custom MAC addresses.
   networking.networkmanager.wifi.scanRandMacAddress = lib.mkDefault false;
+  networking.networkmanager.wifi.macAddress = lib.mkDefault "preserve";
 
   hardware = {
     enableRedistributableFirmware = lib.mkDefault true;
