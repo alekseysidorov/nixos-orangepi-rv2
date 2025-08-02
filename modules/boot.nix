@@ -3,7 +3,7 @@
 {
   # Some common tweaks for nix packages
   nixpkgs = {
-    overlays = [ import ./.. ];
+    overlays = [ (import ./..) ];
   };
 
   boot = {
