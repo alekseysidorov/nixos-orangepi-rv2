@@ -10,6 +10,14 @@
 
   system.stateVersion = lib.mkDefault lib.trivial.release;
 
+  # Network manager more useful than the wpa_supplicant.
+  networking.wireless.enable = false;
+  networking.networkmanager = {
+    enable = true;
+    # A lot of plugins are not supported on riscv64. Disable all plugins to avoid errors.
+    plugins = lib.mkForce [ ];
+  };
+
   sdImage = {
     populateFirmwareCommands = "";
     populateRootCommands = ''
