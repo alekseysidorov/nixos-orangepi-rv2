@@ -28,6 +28,9 @@ in
     SERIAL_8250 = lib.mkForce no;
     SERIAL_PXA_KY_X1 = yes;
 
+    # Graphics
+    POWERVR_ROGUE = yes;
+
     # Broken
     SPI_DESIGNWARE_EXT = no;
     TOUCHSCREEN_GT9XX = no;
