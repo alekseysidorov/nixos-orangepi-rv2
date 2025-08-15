@@ -30,7 +30,7 @@ jobs:
   build-cache:
     strategy:
       matrix:
-        package: [pkgs-all-cross]
+        package: [pkgs-all-cross, pkgs-all-native]
 
     runs-on: ubuntu-latest
     steps:
