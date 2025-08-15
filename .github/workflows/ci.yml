@@ -13,7 +13,10 @@ jobs:
 
       - uses: cachix/install-nix-action@v30
         with:
-          nix_path: nixpkgs=channel:nixos-25.05
+          extra_nix_config: |
+            substituters = https://cache.nichi.co https://cache.ztier.in
+            trusted-public-keys = hydra.nichi.co-0:P3nkYHhmcLR3eNJgOAnHDjmQLkfqheGyhZ6GLrUVHwk= cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM=
+            extra-platforms = riscv64-linux
 
       - name: Setup Attic cache
         uses: ryanccn/attic-action@v0
