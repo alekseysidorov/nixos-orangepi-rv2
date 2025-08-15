@@ -11,11 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31
         with:
+          enable_kvm: true
           extra_nix_config: |
             substituters = https://cache.nichi.co https://cache.ztier.in
             trusted-public-keys = hydra.nichi.co-0:P3nkYHhmcLR3eNJgOAnHDjmQLkfqheGyhZ6GLrUVHwk= cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM=
+            system-features = nixos-test benchmark big-parallel kvm
             extra-platforms = riscv64-linux
 
       - name: Setup Attic cache
