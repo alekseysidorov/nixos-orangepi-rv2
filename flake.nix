@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -36,6 +36,7 @@
             overlays = [ overlay ];
           };
 
+          # List of packages to build for the riscv64 system.
           buildPackagesAll = pkgs:
             pkgs.writeShellApplication {
               name = "build-packages-all";
@@ -44,15 +45,42 @@
                 linux-orangepi-ky
                 esos-elf-firmware
                 orangepi-xunlong-firmware
-                nix
-                git
               ];
 
               text = '''';
             };
 
-          # Add treefmt formatter.
           pkgsLocal = import nixpkgs { inherit localSystem; };
+          # Utilities to create SD images.
+          sdImageUtils = {
+            makeImage = configuration:
+              let
+                sdImage = (pkgsLocal.nixos {
+                  imports = [
+                    configuration
+                  ];
+                }).config.system.build.sdImage;
+              in
+              pkgsLocal.pkgsBuildBuild.stdenv.mkDerivation {
+                name = "sd-image-orangepi-rv2.img.zst";
+                version = "1.0.0";
+                src = sdImage;
+
+                phases = [ "installPhase" ];
+                noAuditTmpdir = true;
+                preferLocalBuild = true;
+
+                installPhase = "ln -s $src/sd-image/*.img.zst $out";
+              };
+            # Utilites to flash SD images to devices.
+            makeFlashCommand = sdImage:
+              pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
+                #!/${pkgsLocal.pkgsBuildBuild.runtimeShell}
+                set -euo pipefail
+                "${pkgsLocal.pkgsBuildBuild.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
+              '';
+          };
+          # Create treefmt configuration for formatting Nix code.
           treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
         in
         {
@@ -66,9 +94,9 @@
           packages = rec {
             default = sd-image-installer;
             # Main installer in cross compile mode.
-            sd-image-installer = pkgsCross.sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
+            sd-image-installer = sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
             # Flash script for the cross-compiled image.
-            flash-sd-image-installer = pkgsCross.sdImageUtils.makeFlashCommand sd-image-installer;
+            flash-sd-image-installer = sdImageUtils.makeFlashCommand sd-image-installer;
             # Build all packages for cahining.
             pkgs-all-cross = buildPackagesAll pkgsCross;
             pkgs-all-native = buildPackagesAll pkgsNative;

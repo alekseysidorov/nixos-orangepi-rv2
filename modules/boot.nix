@@ -12,7 +12,7 @@
       generic-extlinux-compatible.enable = true;
     };
 
-    consoleLogLevel = lib.mkDefault 5;
+    consoleLogLevel = lib.mkDefault 4;
 
     kernelParams = [
       "console=tty1"
