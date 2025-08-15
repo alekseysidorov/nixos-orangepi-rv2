@@ -31,8 +31,8 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
           enable_kvm: true
           extra_nix_config: |
-            substituters = https://cache.nichi.co https://cache.ztier.in
-            trusted-public-keys = hydra.nichi.co-0:P3nkYHhmcLR3eNJgOAnHDjmQLkfqheGyhZ6GLrUVHwk= cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM=
+            substituters = https://cache.nixos.org https://cache.nichi.co https://cache.ztier.in
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.nichi.co-0:P3nkYHhmcLR3eNJgOAnHDjmQLkfqheGyhZ6GLrUVHwk= cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM=
             system-features = nixos-test benchmark big-parallel kvm
             extra-platforms = riscv64-linux
 
