@@ -20,7 +20,7 @@ jobs:
   build-cache:
     strategy:
       matrix:
-        package: [pkgs-all-cross, pkgs-all-native]
+        package: [pkgs-all-cross]
 
     runs-on: ubuntu-latest
     steps:
@@ -33,7 +33,6 @@ jobs:
           extra_nix_config: |
             substituters = https://cache.nixos.org https://cache.nichi.co https://cache.ztier.in
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.nichi.co-0:P3nkYHhmcLR3eNJgOAnHDjmQLkfqheGyhZ6GLrUVHwk= cache.ztier.link-1:3P5j2ZB9dNgFFFVkCQWT3mh0E+S3rIWtZvoql64UaXM=
-            system-features = nixos-test benchmark big-parallel kvm
             extra-platforms = riscv64-linux
 
       - name: Setup Attic cache
