@@ -36,13 +36,12 @@
             overlays = [ overlay ];
           };
 
-          # List of packages to build for the riscv64 system.
+          # Build all packages for the cross-compiled system.
           buildPackagesAll = pkgs:
             pkgs.writeShellApplication {
               name = "build-packages-all";
 
               runtimeInputs = with pkgs; [
-                linux-orangepi-ky
                 esos-elf-firmware
                 orangepi-xunlong-firmware
               ];
