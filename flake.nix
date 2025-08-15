@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -29,10 +29,31 @@
             config.allowUnfree = true;
             overlays = [ overlay ];
           };
+          # Use the emulated riscv64 system to build packages
+          pkgsNative = import nixpkgs {
+            localSystem = crossSystem;
+            config.allowUnfree = true;
+            overlays = [ overlay ];
+          };
+
+          buildPackagesAll = pkgs:
+            pkgs.writeShellApplication {
+              name = "build-packages-all";
+
+              runtimeInputs = with pkgs; [
+                linux-orangepi-ky
+                esos-elf-firmware
+                orangepi-xunlong-firmware
+                nix
+                git
+              ];
+
+              text = '''';
+            };
+
           # Add treefmt formatter.
           pkgsLocal = import nixpkgs { inherit localSystem; };
           treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
-
         in
         {
           # Formatter for `nix fmt`
@@ -43,11 +64,14 @@
           };
 
           packages = rec {
-            # Main installer in cross compile mode
-            sd-image-installer = pkgsCross.sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
-            # Flash script for the cross-compiled image
-            flash-sd-image-installer = pkgsCross.sdImageUtils.makeFlashCommand sd-image-installer;
             default = sd-image-installer;
+            # Main installer in cross compile mode.
+            sd-image-installer = pkgsCross.sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
+            # Flash script for the cross-compiled image.
+            flash-sd-image-installer = pkgsCross.sdImageUtils.makeFlashCommand sd-image-installer;
+            # Build all packages for cahining.
+            pkgs-all-cross = buildPackagesAll pkgsCross;
+            pkgs-all-native = buildPackagesAll pkgsNative;
           };
         }
       )

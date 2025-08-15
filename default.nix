@@ -1,6 +1,15 @@
 # This file defines an overlay for NixOS
 # When imported, it extends nixpkgs with the packages from this repository
-final: prev: {
+final: prev:
+let
+  dontCheck = drv: drv.overrideAttrs (old: {
+    doCheck = false;
+  });
+  dontInstallCheck = drv: drv.overrideAttrs (old: {
+    doInstallCheck = false;
+  });
+in
+{
   # Firmware packages
   esos-elf-firmware = final.callPackage ./pkgs/firmware/esos-elf-firmware.nix { };
   orangepi-xunlong-firmware = final.callPackage ./pkgs/firmware/orangepi-xunlong-firmware.nix { };
@@ -41,4 +50,9 @@ final: prev: {
         "${prev.pkgsBuildBuild.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
       '';
   };
+
+  # Fixes for packages
+  git = dontInstallCheck prev.git;
+  nix = dontCheck prev.nix;
+
 }
