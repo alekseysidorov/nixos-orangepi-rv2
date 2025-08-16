@@ -42,5 +42,5 @@ jobs:
           cache: ${{ vars.ATTIC_CACHE }}
           token: ${{ secrets.ATTIC_TOKEN }}
 
-      # - name: "Build Packages"
-      #   run: nix build ".#${{ matrix.package }}"
+      - name: "Build Packages"
+        run: nix build ".#${{ matrix.package }}"
