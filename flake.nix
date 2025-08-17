@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/d3d2d80a2191a73d1e86456a751b83aa13085d7d";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
