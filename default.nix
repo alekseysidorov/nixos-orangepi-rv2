@@ -1,14 +1,6 @@
 # This file defines an overlay for NixOS
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev:
-let
-  dontCheck = drv: drv.overrideAttrs (old: {
-    doCheck = false;
-  });
-  dontInstallCheck = drv: drv.overrideAttrs (old: {
-    doInstallCheck = false;
-  });
-in
 {
   # Firmware packages
   esos-elf-firmware = final.callPackage ./pkgs/firmware/esos-elf-firmware.nix { };
@@ -18,4 +10,8 @@ in
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
+
+  guitarix = final.callPackage ./pkgs/fixes/guitarix.nix {
+    optimizationSupport = false; # Disable optimizations for riscv64
+  };
 }
