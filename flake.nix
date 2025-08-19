@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/d3d2d80a2191a73d1e86456a751b83aa13085d7d";
+    nixpkgs.url = "github:NixOS/nixpkgs/94def634a20494ee057c76998843c015909d6311";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -45,6 +45,7 @@
                 esos-elf-firmware
                 orangepi-xunlong-firmware
                 guitarix
+                westonLite
               ];
 
               text = '''';
