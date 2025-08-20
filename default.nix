@@ -2,11 +2,12 @@
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev:
 let
-  dontCheck = drv: drv.overrideAttrs (old: {
+  disableAllChecks = pkg: pkg.overrideAttrs (_: {
     doCheck = false;
-  });
-  dontInstallCheck = drv: drv.overrideAttrs (old: {
     doInstallCheck = false;
+    checkPhase = "true"; # replace test command with a no-op stub
+    installCheckPhase = "true"; # replace install-time tests with a no-op stub
+    pythonImportsCheck = [ ];
   });
 in
 {
@@ -18,4 +19,14 @@ in
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
+
+  # Fixes for packages
+  guitarix = final.callPackage ./pkgs/fixes/guitarix.nix {
+    optimizationSupport = false; # Disable optimizations for riscv64
+  };
+  # A lot of packages have tests that fail on riscv64
+  python3Packages = prev.python3Packages.overrideScope (f: p: {
+    eventlet = disableAllChecks p.eventlet;
+    picosvg = disableAllChecks p.picosvg;
+  });
 }
