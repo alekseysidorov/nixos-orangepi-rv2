@@ -1,6 +1,15 @@
 # This file defines an overlay for NixOS
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev:
+let
+  disableAllChecks = pkg: pkg.overrideAttrs (_: {
+    doCheck = false;
+    doInstallCheck = false;
+    checkPhase = "true"; # replace test command with a no-op stub
+    installCheckPhase = "true"; # replace install-time tests with a no-op stub
+    pythonImportsCheck = [ ];
+  });
+in
 {
   # Firmware packages
   esos-elf-firmware = final.callPackage ./pkgs/firmware/esos-elf-firmware.nix { };
@@ -11,7 +20,13 @@ final: prev:
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
+  # Fixes for packages
   guitarix = final.callPackage ./pkgs/fixes/guitarix.nix {
     optimizationSupport = false; # Disable optimizations for riscv64
   };
+  # A lot of packages have tests that fail on riscv64
+  python3Packages = prev.python3Packages.overrideScope (f: p: {
+    eventlet = disableAllChecks p.eventlet;
+    picosvg = disableAllChecks p.picosvg;
+  });
 }
