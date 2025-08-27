@@ -56,13 +56,13 @@
           sdImageUtils = {
             makeImage = configuration:
               let
-                sdImage = (pkgsLocal.nixos {
+                sdImage = (pkgsCross.nixos {
                   imports = [
                     configuration
                   ];
                 }).config.system.build.sdImage;
               in
-              pkgsLocal.pkgsBuildBuild.stdenv.mkDerivation {
+              pkgsLocal.stdenv.mkDerivation {
                 name = "sd-image-orangepi-rv2.img.zst";
                 version = "1.0.0";
                 src = sdImage;
@@ -76,9 +76,9 @@
             # Utilites to flash SD images to devices.
             makeFlashCommand = sdImage:
               pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
-                #!/${pkgsLocal.pkgsBuildBuild.runtimeShell}
+                #!/${pkgsLocal.runtimeShell}
                 set -euo pipefail
-                "${pkgsLocal.pkgsBuildBuild.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
+                "${pkgsLocal.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
               '';
           };
           # Create treefmt configuration for formatting Nix code.
