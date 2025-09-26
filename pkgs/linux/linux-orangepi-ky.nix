@@ -72,7 +72,9 @@ in
   };
 } // (args.argsOverride or { }))).overrideAttrs (old: {
   nativeBuildInputs = old.nativeBuildInputs or [ ] ++ (with buildPackages; [ ubootTools ]);
-  env.NIX_CFLAGS_COMPILE = toString [
+  # https://github.com/NixOS/nixpkgs/pull/438688
+  # https://stackoverflow.com/questions/40442218/how-to-pass-compiler-options-during-linux-kernel-compilation
+  env.KCFLAGS = toString [
     "-Wno-error=incompatible-pointer-types"
     "-Wno-error=implicit-function-declaration"
     "-Wno-error=int-conversion"
