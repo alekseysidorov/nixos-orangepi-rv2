@@ -42,10 +42,11 @@
               name = "build-packages-all";
 
               runtimeInputs = with pkgs; [
-                esos-elf-firmware
-                orangepi-xunlong-firmware
-                guitarix
-                westonLite
+                # esos-elf-firmware
+                # orangepi-xunlong-firmware
+                # guitarix
+                # westonLite
+                zlib-rs
               ];
 
               text = '''';

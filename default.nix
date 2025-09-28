@@ -29,4 +29,6 @@ in
     eventlet = disableAllChecks p.eventlet;
     picosvg = disableAllChecks p.picosvg;
   });
+
+  zlib-rs = final.callPackage ./pkgs/zlib-rs.nix { };
 }
