@@ -54,15 +54,15 @@
           pkgsLocal = import nixpkgs { inherit localSystem; };
           # Utilities to create SD images.
           sdImageUtils = {
-            makeImage = configuration:
+            makeImage = pkgs:
               let
-                sdImage = (pkgsLocal.nixos {
+                sdImage = (pkgs.nixos {
                   imports = [
-                    configuration
+                    ./sd-images/sd-image-orangepi-rv2-installer.nix
                   ];
                 }).config.system.build.sdImage;
               in
-              pkgsLocal.pkgsBuildBuild.stdenv.mkDerivation {
+              pkgsLocal.stdenv.mkDerivation {
                 name = "sd-image-orangepi-rv2.img.zst";
                 version = "1.0.0";
                 src = sdImage;
@@ -78,7 +78,7 @@
               pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
                 #!/${pkgsLocal.pkgsBuildBuild.runtimeShell}
                 set -euo pipefail
-                "${pkgsLocal.pkgsBuildBuild.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
+                "${pkgsLocal.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
               '';
           };
           # Create treefmt configuration for formatting Nix code.
@@ -95,9 +95,11 @@
           packages = rec {
             default = sd-image-installer;
             # Main installer in cross compile mode.
-            sd-image-installer = sdImageUtils.makeImage ./sd-images/sd-image-orangepi-rv2-installer.nix;
+            sd-image-installer = sdImageUtils.makeImage pkgsCross;
+            sd-image-installer-native = sdImageUtils.makeImage pkgsNative;
             # Flash script for the cross-compiled image.
             flash-sd-image-installer = sdImageUtils.makeFlashCommand sd-image-installer;
+            flash-sd-image-installer-native = sdImageUtils.makeFlashCommand sd-image-installer-native;
             # Build all packages for cahining.
             pkgs-all-cross = buildPackagesAll pkgsCross;
             pkgs-all-native = buildPackagesAll pkgsNative;
