@@ -4,11 +4,13 @@
 , buildLinux
 , fetchFromGitHub
 , fetchpatch
+, stdenv
+, fetchurl
 , ...
 } @ args:
 
 let
-  modDirVersion = "6.6.63";
+  modDirVersion = "6.6.64";
 
   fetchCwtPatch = { name, hash }: {
     inherit name;
@@ -18,6 +20,23 @@ let
     };
   };
 
+  fetchKernelPatchArchive = { name, hash }: {
+    inherit name;
+    patch = stdenv.mkDerivation {
+      pname = name;
+      version = "1";
+      src = fetchurl {
+        url = "https://cdn.kernel.org/pub/linux/kernel/v6.x/incr/${name}";
+        inherit hash;
+      };
+      dontConfigure = true;
+      dontBuild = true;
+      dontInstall = true;
+      unpackPhase = ''
+        xz -dc $src > $out
+      '';
+    };
+  };
 in
 (buildLinux (args // {
   inherit modDirVersion;
@@ -77,6 +96,10 @@ in
     (fetchCwtPatch {
       name = "linux-04-fix-timer-ky_x1-conflict-types.patch";
       hash = "sha256-wtUTGfisAzacPlN76lZTLgU8biTicTZMLtCDxgcLV40=";
+    })
+    (fetchKernelPatchArchive {
+      name = "patch-6.6.63-64.xz";
+      hash = "sha256-9H7xASKq8vpPPh8FtL7BmtaYp5BpLbmTDQv01CERZNA=";
     })
   ];
 
