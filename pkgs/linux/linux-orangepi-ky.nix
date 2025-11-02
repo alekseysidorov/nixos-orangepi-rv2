@@ -9,6 +9,15 @@
 
 let
   modDirVersion = "6.6.63";
+
+  fetchCwtPatch = { name, hash }: {
+    inherit name;
+    patch = fetchpatch {
+      url = "https://raw.githubusercontent.com/cwt-opi-rv2/linux-cwt-orangepi-ky/main/${name}";
+      inherit hash;
+    };
+  };
+
 in
 (buildLinux (args // {
   inherit modDirVersion;
@@ -50,33 +59,25 @@ in
 
   kernelPatches = [
     {
-      name = "enable_pxa_pwm_on_ky_x1";
-      patch = fetchpatch {
-        url = "https://raw.githubusercontent.com/cwt-opi-rv2/linux-cwt-orangepi-ky/main/linux-01-enable_pxa_pwm_on_ky_x1.patch";
-        hash = "sha256-nDTiRfAhgok06tP//m9NG2PoEfpKQS2Gz5mpHSHo9Pg=";
-      };
+      name = "bcmdhd-makefile-include-fix";
+      patch = ./bcmdhd-makefile-include-fix.patch;
     }
-    {
-      name = "add_DMA_BUF_ns_import_to_amvx";
-      patch = fetchpatch {
-        url = "https://raw.githubusercontent.com/cwt-opi-rv2/linux-cwt-orangepi-ky/main/linux-02-add_DMA_BUF_ns_import_to_amvx.patch";
-        hash = "sha256-V2vWHTmai4PZapTGlAJnJUetv+P4C0xK01GgFUdcCKw=";
-      };
-    }
-    {
-      name = "enable-ky_x1-clocksource";
-      patch = fetchpatch {
-        url = "https://raw.githubusercontent.com/cwt-opi-rv2/linux-cwt-orangepi-ky/main/linux-03-enable-ky_x1-clocksource.patch";
-        hash = "sha256-2UpkCWH+QcQtJWOT1X7YFCiUDZcksyk/Wf/frHb3waU=";
-      };
-    }
-    {
-      name = "fix-timer-ky_x1-conflict-types";
-      patch = fetchpatch {
-        url = "https://raw.githubusercontent.com/cwt-opi-rv2/linux-cwt-orangepi-ky/main/linux-04-fix-timer-ky_x1-conflict-types.patch";
-        hash = "sha256-wtUTGfisAzacPlN76lZTLgU8biTicTZMLtCDxgcLV40=";
-      };
-    }
+    (fetchCwtPatch {
+      name = "linux-01-enable_pxa_pwm_on_ky_x1.patch";
+      hash = "sha256-nDTiRfAhgok06tP//m9NG2PoEfpKQS2Gz5mpHSHo9Pg=";
+    })
+    (fetchCwtPatch {
+      name = "linux-02-add_DMA_BUF_ns_import_to_amvx.patch";
+      hash = "sha256-V2vWHTmai4PZapTGlAJnJUetv+P4C0xK01GgFUdcCKw=";
+    })
+    (fetchCwtPatch {
+      name = "linux-03-enable-ky_x1-clocksource.patch";
+      hash = "sha256-2UpkCWH+QcQtJWOT1X7YFCiUDZcksyk/Wf/frHb3waU=";
+    })
+    (fetchCwtPatch {
+      name = "linux-04-fix-timer-ky_x1-conflict-types.patch";
+      hash = "sha256-wtUTGfisAzacPlN76lZTLgU8biTicTZMLtCDxgcLV40=";
+    })
   ];
 
   extraMeta = {
