@@ -44,8 +44,9 @@
               runtimeInputs = with pkgs; [
                 esos-elf-firmware
                 orangepi-xunlong-firmware
-                guitarix
-                westonLite
+                # guitarix
+                # westonLite
+                iniparser
               ];
 
               text = '''';

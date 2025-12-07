@@ -25,4 +25,7 @@ in
     eventlet = disableAllChecks p.eventlet;
     picosvg = disableAllChecks p.picosvg;
   });
+
+  # Collection of fixes for various packages that will be upstreamed eventually
+  iniparser = final.callPackage ./pkgs/fixes/iniparser.nix { };
 }
