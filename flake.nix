@@ -44,7 +44,7 @@
               runtimeInputs = with pkgs; [
                 esos-elf-firmware
                 orangepi-xunlong-firmware
-                # guitarix
+                guitarix
                 # westonLite
                 iniparser
                 vim-full
