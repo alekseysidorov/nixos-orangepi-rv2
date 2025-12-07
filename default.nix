@@ -28,4 +28,8 @@ in
 
   # Collection of fixes for various packages that will be upstreamed eventually
   iniparser = final.callPackage ./pkgs/fixes/iniparser.nix { };
+
+  vim-full = prev.vim-full.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.wayland-scanner ];
+  });
 }

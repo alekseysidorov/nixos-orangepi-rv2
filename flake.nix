@@ -47,6 +47,7 @@
                 # guitarix
                 # westonLite
                 iniparser
+                vim-full
               ];
 
               text = '''';
