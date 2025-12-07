@@ -12,10 +12,10 @@
       generic-extlinux-compatible.enable = true;
     };
 
-    consoleLogLevel = lib.mkDefault 4;
+    consoleLogLevel = lib.mkDefault 7;
 
     kernelParams = [
-      "console=tty1"
+      "console=tty0"
       "console=ttyS0,115200"
       "earlycon=sbi"
       "boot.shell_on_fail"
@@ -26,9 +26,26 @@
     blacklistedKernelModules = [ "onboard_usb_hub" ]; # breaks usb boot
 
     initrd = {
-      availableKernelModules = [ "nvme" ];
+      availableKernelModules = [
+        "dw_mmc-starfive"
+        "motorcomm"
+        "dwmac-starfive"
+        "cdns3-starfive"
+        "jh7110-trng"
+        "phy-jh7110-usb"
+        "clk-starfive-jh7110-aon"
+        "clk-starfive-jh7110-stg"
+        "clk-starfive-jh7110-vout"
+        "clk-starfive-jh7110-isp"
+        "clk-starfive-jh7100-audio"
+        "phy-jh7110-pcie"
+        "pcie-starfive"
+        "nvme"
+      ];
       extraFirmwarePaths = [ "esos.elf" ];
     };
+
+    supportedFilesystems.zfs = lib.mkForce false;
   };
 
   # Wifi driver doesn't support custom MAC addresses.

@@ -20,10 +20,6 @@ in
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
 
-  # Fixes for packages
-  guitarix = final.callPackage ./pkgs/fixes/guitarix.nix {
-    optimizationSupport = false; # Disable optimizations for riscv64
-  };
   # A lot of packages have tests that fail on riscv64
   python3Packages = prev.python3Packages.overrideScope (f: p: {
     eventlet = disableAllChecks p.eventlet;
