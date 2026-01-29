@@ -13,7 +13,7 @@ in
 {
   # Firmware packages
   esos-elf-firmware = final.callPackage ./pkgs/firmware/esos-elf-firmware.nix { };
-  orangepi-xunlong-firmware = final.callPackage ./pkgs/firmware/orangepi-xunlong-firmware.nix { };
+  orangepi-firmware = final.callPackage ./pkgs/firmware/orangepi-firmware.nix { };
   # Kernel packages
   linux-orangepi-ky = final.callPackage ./pkgs/linux/linux-orangepi-ky.nix { };
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
