@@ -56,7 +56,7 @@
     enableRedistributableFirmware = lib.mkDefault true;
     firmware = with pkgs; [
       esos-elf-firmware
-      orangepi-xunlong-firmware
+      orangepi-firmware
     ];
     deviceTree.name = "ky/x1_orangepi-rv2.dtb";
   };
