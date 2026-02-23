@@ -1,7 +1,8 @@
-{ stdenvNoCC
-, lib
-, fetchurl
-, ...
+{
+  stdenvNoCC,
+  lib,
+  fetchurl,
+  ...
 }:
 stdenvNoCC.mkDerivation {
   pname = "esos-elf";

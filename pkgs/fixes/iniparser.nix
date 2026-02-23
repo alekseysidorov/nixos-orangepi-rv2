@@ -1,15 +1,15 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, replaceVars
-, cmake
-, doxygen
-, ruby
-, validatePkgConfig
-, testers
-, unity-test
-, ctestCheckHook
-,
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  replaceVars,
+  cmake,
+  doxygen,
+  ruby,
+  validatePkgConfig,
+  testers,
+  unity-test,
+  ctestCheckHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -45,9 +45,9 @@ stdenv.mkDerivation (finalAttrs: {
       (unity-test.override {
         supportDouble = true;
       }).overrideAttrs
-        {
-          doCheck = false;
-        }
+      {
+        doCheck = false;
+      }
     )
   ];
 
