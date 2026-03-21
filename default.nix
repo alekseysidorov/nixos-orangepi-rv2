@@ -29,6 +29,4 @@ in
       picosvg = disableAllChecks p.picosvg;
     }
   );
-
-  guitarix = final.callPackage ./pkgs/fixes/guitarix.nix { optimizationSupport = true; };
 }
