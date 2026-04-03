@@ -60,6 +60,7 @@
               westonLite
               iniparser
               vim-full
+              patch
             ];
 
             text = "";
