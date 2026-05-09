@@ -40,7 +40,7 @@
         };
         # Use the emulated riscv64 system to build packages
         pkgsNative = import nixpkgs {
-          localSystem = crossSystem;
+          inherit localSystem;
           config.allowUnfree = true;
           overlays = [ overlay ];
         };
@@ -56,6 +56,7 @@
               esos-elf-firmware
               orangepi-firmware
               guitarix
+              libqmi
 
               westonLite
               iniparser
