@@ -274,6 +274,7 @@ stdenv.mkDerivation (finalAttrs: {
   strictDeps = true;
 
   nativeBuildInputs = [
+    pcre2
     cargo
     cmake
     gettext
@@ -290,8 +291,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    libiconv
     pcre2
+    libiconv
   ];
 
   cmakeFlags = [

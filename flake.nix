@@ -62,6 +62,7 @@
               iniparser
               vim-full
               patch
+              modemmanager
             ];
 
             text = "";
