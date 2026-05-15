@@ -57,7 +57,7 @@
               orangepi-firmware
               guitarix
               libqmi
-
+              fish
               westonLite
               iniparser
               vim-full

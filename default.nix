@@ -30,8 +30,25 @@ in
     }
   );
 
-  # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
-  libqmi = prev.libqmi.overrideAttrs (old: {
-    mesonFlags = (old.mesonFlags or []) ++ [ "-Dgtk_doc=false" ];
-  });
+  # Workaround for a nixpkgs bug: https://github.com/NixOS/nixpkgs/issues/FIXME
+  #
+  # libqmi conflates two distinct features under a single `withIntrospection` flag:
+  #   1. GObject introspection (g-ir-scanner/compiler) — can work in cross builds
+  #      when an emulator (QEMU) is available to run host binaries.
+  #   2. API documentation via gi-docgen — requires build-machine `pkg-config`
+  #      (i.e. plain `pkg-config`, not the cross-prefixed wrapper) to locate
+  #      the gi-docgen package at meson configure time.
+  #
+  # In a nixpkgs cross build only the cross-prefixed pkg-config is in PATH, so
+  # meson fails with:
+  #   "Pkg-config for machine build machine not found. Giving up."
+  #
+  # The upstream fix should split withIntrospection into two parameters:
+  #   withIntrospection — keep the current emulatorAvailable condition
+  #   withDoc (defaulting to withIntrospection && buildPlatform == hostPlatform)
+  #             — gates gi-docgen / gtk_doc only when native pkg-config is present
+  #
+  # Until that is fixed upstream we force withIntrospection=false for the whole
+  # cross-compiled package set, which also disables gtk_doc.
+  libqmi = prev.libqmi.override { withIntrospection = false; };
 }
