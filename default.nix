@@ -32,19 +32,15 @@ in
 
   # Workaround for a nixpkgs bug: fish cross-compilation fails because xtask
   # (a Rust build-time utility compiled for the build machine) links against
-  # pcre2 via the pcre2-sys crate. In a cross build, buildInputs provides only
-  # the host-arch (riscv64) pcre2, so the native x86_64 linker gets:
-  #   ld: skipping incompatible libpcre2-8.so when searching for -lpcre2-8
+  # pcre2 via the pcre2-sys crate. cmake/Docs.cmake runs `cargo xtask` without
+  # --target, so xtask is compiled for x86_64, but it inherits PKG_CONFIG from
+  # the cross environment (riscv64-...-pkg-config). pcre2-sys then finds riscv64
+  # pcre2 and the native x86_64 linker fails with "skipping incompatible".
   #
-  # The fix: buildPackages.pcre2 (x86_64) must be in nativeBuildInputs so that
-  # native pkg-config can find it when xtask's build script runs.
-  #
-  # Upstream fix: add `buildPackages` as an argument to pkgs/shells/fish/package.nix
-  # and add `lib.optional (stdenv.buildPlatform != stdenv.hostPlatform) buildPackages.pcre2`
-  # to nativeBuildInputs.
-  fish = prev.fish.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.pkgsBuildBuild.pcre2 ];
-  });
+  # Upstream fix: add `buildPackages` arg and set PKG_CONFIG/PKG_CONFIG_PATH
+  # explicitly in VARS_FOR_CARGO_SPHINX_WRAPPER in cmake/Docs.cmake for cross builds.
+  # See pkgs/fish/package.nix for the actual patch.
+  fish = final.callPackage ./pkgs/fish/package.nix { };
 
   # libqmi conflates two distinct features under a single `withIntrospection` flag:
   #   1. GObject introspection (g-ir-scanner/compiler) — can work in cross builds
