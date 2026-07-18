@@ -309,7 +309,13 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     (lib.cmakeBool "MAC_CODESIGN_ID" false)
-  ];
+  ]
+  # xtask (used for doc generation) is built for the build platform but pkg-config
+  # returns the target's pcre2 during cross-compilation, causing linker errors.
+  # Disable docs when cross-compiling to avoid building xtask entirely.
+  ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) (
+    lib.cmakeBool "WITH_DOCS" false
+  );
 
   # Fish’s test suite needs to be able to look up process information and send signals.
   sandboxProfile = lib.optionalString stdenv.hostPlatform.isDarwin ''
