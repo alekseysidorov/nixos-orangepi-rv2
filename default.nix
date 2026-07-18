@@ -30,10 +30,19 @@ in
     }
   );
 
-  # # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
-  # libqmi = prev.libqmi.overrideAttrs (old: {
-  #   mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dgtk_doc=false" ];
-  # });
+  # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
+  libqmi = prev.libqmi.overrideAttrs (old: {
+    mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dgtk_doc=false" ];
+  });
 
-  fish = final.callPackage ./pkgs/fish/package.nix { };
+  # Temporary fix: xtask (used for doc generation) is built for the build platform
+  # but pkg-config returns the target's pcre2 during cross-compilation, causing
+  # linker errors. Disable docs when cross-compiling.
+  fish = prev.fish.overrideAttrs (old: {
+    cmakeFlags =
+      old.cmakeFlags
+      ++ final.lib.optionals (final.stdenv.hostPlatform != final.stdenv.buildPlatform) [
+        (final.lib.cmakeBool "WITH_DOCS" false)
+      ];
+  });
 }

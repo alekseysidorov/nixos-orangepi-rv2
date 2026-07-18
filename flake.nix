@@ -52,18 +52,17 @@
             name = "build-packages-all";
 
             runtimeInputs = with pkgs; [
-              # linux-orangepi-ky
-              # esos-elf-firmware
-              # orangepi-firmware
-              # guitarix
-              # libqmi
-              # fish
-              # westonLite
-              # iniparser
-              # vim-full
-              # patch
-              # modemmanager
+              linux-orangepi-ky
+              esos-elf-firmware
+              orangepi-firmware
+              guitarix
+              libqmi
               fish
+              westonLite
+              iniparser
+              vim-full
+              patch
+              modemmanager
             ];
 
             text = "";
