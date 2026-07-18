@@ -2,7 +2,7 @@
   description = "NixOS installer for Orange Pi RV2";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -52,17 +52,18 @@
             name = "build-packages-all";
 
             runtimeInputs = with pkgs; [
-              linux-orangepi-ky
-              esos-elf-firmware
-              orangepi-firmware
-              guitarix
-              libqmi
+              # linux-orangepi-ky
+              # esos-elf-firmware
+              # orangepi-firmware
+              # guitarix
+              # libqmi
+              # fish
+              # westonLite
+              # iniparser
+              # vim-full
+              # patch
+              # modemmanager
               fish
-              westonLite
-              iniparser
-              vim-full
-              patch
-              modemmanager
             ];
 
             text = "";

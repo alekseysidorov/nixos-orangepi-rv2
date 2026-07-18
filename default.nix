@@ -30,10 +30,10 @@ in
     }
   );
 
-  # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
-  libqmi = prev.libqmi.overrideAttrs (old: {
-    mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dgtk_doc=false" ];
-  });
+  # # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
+  # libqmi = prev.libqmi.overrideAttrs (old: {
+  #   mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dgtk_doc=false" ];
+  # });
 
   fish = final.callPackage ./pkgs/fish/package.nix { };
 }
