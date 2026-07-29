@@ -1,17 +1,6 @@
 # This file defines an overlay for NixOS
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev:
-let
-  disableAllChecks =
-    pkg:
-    pkg.overrideAttrs (_: {
-      doCheck = false;
-      doInstallCheck = false;
-      checkPhase = "true"; # replace test command with a no-op stub
-      installCheckPhase = "true"; # replace install-time tests with a no-op stub
-      pythonImportsCheck = [ ];
-    });
-in
 {
   # Firmware packages
   esos-elf-firmware = final.callPackage ./pkgs/firmware/esos-elf-firmware.nix { };
@@ -21,19 +10,6 @@ in
   linuxPackages_orangepi_ky = final.linuxPackagesFor final.linux-orangepi-ky;
   # https://github.com/NixOS/nixpkgs/issues/154163#issuecomment-1008362877
   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
-
-  # A lot of packages have tests that fail on riscv64
-  python3Packages = prev.python3Packages.overrideScope (
-    f: p: {
-      eventlet = disableAllChecks p.eventlet;
-      picosvg = disableAllChecks p.picosvg;
-    }
-  );
-
-  # Disable building GTK doc for libqmi to avoid gi-docgen/pkg-config issues during cross builds
-  libqmi = prev.libqmi.overrideAttrs (old: {
-    mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dgtk_doc=false" ];
-  });
 
   # Temporary fix: xtask (used for doc generation) is built for the build platform
   # but pkg-config returns the target's pcre2 during cross-compilation, causing
