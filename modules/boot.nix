@@ -45,7 +45,10 @@
       extraFirmwarePaths = [ "esos.elf" ];
     };
 
-    supportedFilesystems.zfs = lib.mkForce false;
+    supportedFilesystems = {
+      zfs = lib.mkForce false;
+      bcachefs = lib.mkForce false;
+    };
   };
 
   # Wifi driver doesn't support custom MAC addresses.
