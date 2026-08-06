@@ -81,6 +81,9 @@ in
       COMPILE_TEST = no;
       DRM_NOUVEAU = no;
       DRM_AMDGPU = no;
+
+      # Filesystems
+      BCACHEFS = no;
     };
 
     kernelPatches = [
