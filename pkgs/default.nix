@@ -13,7 +13,4 @@ final: prev: {
         (final.lib.cmakeBool "WITH_DOCS" false)
       ];
   });
-
-  # Force remove unsupported bcachefs-tools
-  bcachefs-tools = final.hello;
 }
