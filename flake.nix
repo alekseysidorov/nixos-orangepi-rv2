@@ -63,14 +63,17 @@
           checks = config.packages // {
             # Curated list of cross-compiled packages.
             inherit (pkgs.pkgsCross.riscv64)
-              fish
+              # Minimal needed stuff
               nftables
               tcpdump
               ethtool
               nmap
+              tmux
+
+              # Other packages for convenient development.
+              fish
               nushell
               git
-              tmux
               vim-full
               ;
             amneziawg = pkgs.linuxPackages_testing.amneziawg;

@@ -23,5 +23,5 @@ in
 writeShellScriptBin "flash-sd-image-cross" ''
   #!/${runtimeShell}
   set -euo pipefail
-  "${lib.getExe caligula} burn -z zst -s none "${sdImageArchive}"
+  "${lib.getExe caligula}" burn -z zst -s none "${sdImageArchive}"
 ''
