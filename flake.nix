@@ -41,6 +41,10 @@
         inputs.nix-devtools.flakeModule
       ];
 
+      flake = {
+        overlays.default = localOverlay;
+      };
+
       perSystem =
         {
           config,

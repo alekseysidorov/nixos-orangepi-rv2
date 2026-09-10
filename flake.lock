@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789036575,
-        "narHash": "sha256-AEyc8VeDFXKZjYYsm9nPHOuGUVXHogGdYjxRAVkCxdU=",
+        "lastModified": 1789043586,
+        "narHash": "sha256-L16NsDHqPgwWxJF2e4vHfPUSPjTiuNNqtd5jYISj++w=",
         "owner": "alekseysidorov",
         "repo": "nix-devtools",
-        "rev": "1fc307ac3f8be5ea8c2bb2c9c847f384a47971f8",
+        "rev": "d7e2b85dcf01be97ca35a975e6f6885ce525e553",
         "type": "github"
       },
       "original": {
