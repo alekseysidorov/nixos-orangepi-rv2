@@ -5,7 +5,12 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    flake-utils.url = "github:numtide/flake-utils";
+    nix-devtools = {
+      url = "github:alekseysidorov/nix-devtools";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,9 +30,13 @@
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       # Declared systems that your flake supports. These will be enumerated in perSystem
-      systems = inputs.nixpkgs.lib.systems.flakeExposed;
+      systems = [
+        "x86_64-linux"
+        "riscv64-linux"
+      ];
       imports = [
         inputs.treefmt-nix.flakeModule
+        inputs.nix-devtools.flakeModule
       ];
 
       perSystem =
@@ -41,6 +50,7 @@
             inherit system;
             overlays = [
               localOverlay
+              inputs.nix-devtools.overlays.default
             ];
           };
         in
@@ -60,7 +70,19 @@
             flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
           };
 
-          checks = config.packages // {
+          # Share formatting rules between `nix fmt` and CI.
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs = {
+              nixfmt = {
+                enable = true;
+                package = pkgs.nixfmt-rs;
+              };
+              taplo.enable = true;
+            };
+          };
+
+          checks = {
             # Curated list of cross-compiled packages.
             inherit (pkgs.pkgsCross.riscv64)
               # Minimal needed stuff
@@ -79,16 +101,16 @@
             amneziawg = pkgs.linuxPackages_testing.amneziawg;
           };
 
-          # Share formatting rules between `nix fmt` and CI.
-          treefmt = {
-            projectRootFile = "flake.nix";
-            programs = {
-              nixfmt = {
-                enable = true;
-                package = pkgs.nixfmt-rs;
-              };
-              taplo.enable = true;
-            };
+          # Install explicitly with `nix run .#install-git-hooks`.
+          gitHooks = {
+            pre-commit = pkgs.writeNushellScript "pre-commit" ''
+              print "⚡️ Running pre-commit checks..."
+              nix build .#checks.${system}.treefmt -L
+            '';
+            pre-push = pkgs.writeNushellScript "pre-push" ''
+              print "⚡️ Running pre-push checks..."
+              nix flake check -L
+            '';
           };
         };
     };
