@@ -31,6 +31,8 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       # Declared systems that your flake supports. These will be enumerated in perSystem
       systems = [
+        "aarch64-darwin"
+        "aarch64-linux"
         "x86_64-linux"
         "riscv64-linux"
       ];
