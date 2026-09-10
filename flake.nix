@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -12,127 +14,79 @@
 
   # Nix configuration is passed via CLI arguments
   # to avoid security and trust issues
-
   outputs =
     {
       self,
-      nixpkgs,
-      flake-utils,
-      treefmt-nix,
+      flake-parts,
       ...
-    }:
+    }@inputs:
     let
-      # Export overlay for use in other flakes
-      overlay = import ./default.nix;
+      localOverlay = import ./pkgs;
     in
-    flake-utils.lib.eachDefaultSystem (
-      localSystem:
-      let
-        # Always cross-compile to riscv64, regardless of host system
-        crossSystem = {
-          system = "riscv64-linux";
-        };
-        # Use the host system to cross-compile to riscv64
-        pkgsCross = import nixpkgs {
-          inherit localSystem crossSystem;
-          config.allowUnfree = true;
-          overlays = [ overlay ];
-        };
-        # Use the emulated riscv64 system to build packages
-        pkgsNative = import nixpkgs {
-          inherit localSystem;
-          config.allowUnfree = true;
-          overlays = [ overlay ];
-        };
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      # Declared systems that your flake supports. These will be enumerated in perSystem
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
+      imports = [
+        inputs.treefmt-nix.flakeModule
+      ];
 
-        # Build all packages for the cross-compiled system.
-        buildPackagesAll =
-          pkgs:
-          pkgs.writeShellApplication {
-            name = "build-packages-all";
-
-            runtimeInputs = with pkgs; [
-              linux-orangepi-ky
-              esos-elf-firmware
-              orangepi-firmware
-              guitarix
-              libqmi
-              fish
-              westonLite
-              iniparser
-              vim-full
-              patch
-              modemmanager
+      perSystem =
+        {
+          config,
+          system,
+          ...
+        }:
+        let
+          pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              localOverlay
             ];
+          };
+        in
+        {
+          # Use the common overlay in all per-system modules.
+          _module.args.pkgs = pkgs;
 
-            text = "";
+          # Expose build artifacts and project commands through `nix build` / `nix run`.
+          packages = {
+            sd-image-installer =
+              (pkgs.nixos {
+                imports = [
+                  ./sd-image-installer.nix
+                ];
+              }).config.system.build.sdImage;
+
+            flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
           };
 
-        pkgsLocal = import nixpkgs { inherit localSystem; };
-        # Utilities to create SD images.
-        sdImageUtils = {
-          makeImage =
-            pkgs:
-            let
-              sdImage =
-                (pkgs.nixos {
-                  imports = [
-                    ./sd-images/sd-image-orangepi-rv2-installer.nix
-                  ];
-                }).config.system.build.sdImage;
-            in
-            pkgsLocal.stdenv.mkDerivation {
-              name = "sd-image-orangepi-rv2.img.zst";
-              version = "1.0.0";
-              src = sdImage;
+          checks = config.packages // {
+            # Curated list of cross-compiled packages.
+            inherit (pkgs.pkgsCross.riscv64)
+              fish
+              nftables
+              tcpdump
+              ethtool
+              nmap
+              nushell
+              git
+              tmux
+              vim-full
+              ;
+            amneziawg = pkgs.linuxPackages_testing.amneziawg;
+          };
 
-              phases = [ "installPhase" ];
-              noAuditTmpdir = true;
-              preferLocalBuild = true;
-
-              installPhase = "ln -s $src/sd-image/*.img.zst $out";
+          # Share formatting rules between `nix fmt` and CI.
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs = {
+              nixfmt = {
+                enable = true;
+                package = pkgs.nixfmt-rs;
+              };
+              taplo.enable = true;
             };
-          # Utilites to flash SD images to devices.
-          makeFlashCommand =
-            sdImage:
-            pkgsLocal.writeShellScriptBin "flash-sd-image-cross" ''
-              #!/${pkgsLocal.pkgsBuildBuild.runtimeShell}
-              set -euo pipefail
-              "${pkgsLocal.caligula}/bin/caligula" burn -z zst -s none "${sdImage}"
-            '';
+          };
         };
-        # Create treefmt configuration for formatting Nix code.
-        treefmt = treefmt-nix.lib.evalModule pkgsLocal ./treefmt.nix;
-      in
-      {
-        # Formatter for `nix fmt`
-        formatter = treefmt.config.build.wrapper;
-        # Checker for `nix flake check`
-        checks = {
-          formatting = treefmt.config.build.check self;
-        };
-
-        packages = rec {
-          default = sd-image-installer;
-          # Main installer in cross compile mode.
-          sd-image-installer = sdImageUtils.makeImage pkgsCross;
-          sd-image-installer-native = sdImageUtils.makeImage pkgsNative;
-          # Flash script for the cross-compiled image.
-          flash-sd-image-installer = sdImageUtils.makeFlashCommand sd-image-installer;
-          flash-sd-image-installer-native = sdImageUtils.makeFlashCommand sd-image-installer-native;
-          # Build all packages for caching.
-          pkgs-all-cross = buildPackagesAll pkgsCross;
-          pkgs-all-native = buildPackagesAll pkgsNative;
-        };
-      }
-    )
-    # System independent modules.
-    // {
-      # Export overlay for use in other projects
-      overlays.default = overlay;
-      # All nixOS modules are kept here
-      nixosModules = {
-        boot = import ./modules/boot.nix;
-      };
     };
 }
