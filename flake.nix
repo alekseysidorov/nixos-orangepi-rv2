@@ -93,6 +93,12 @@
             inherit (pkgs.pkgsCross.riscv64)
               # Minimal needed stuff
               nftables
+              iproute2
+              wireguard-tools
+              curl
+              openssl
+              sops
+              python3
               tcpdump
               ethtool
               nmap
@@ -106,7 +112,9 @@
               nushell
               git
               vim-full
-              ;
+
+              # singbox-dependencies
+              sing-box;
             amneziawg = pkgs.linuxPackages_testing.amneziawg;
           };
 
