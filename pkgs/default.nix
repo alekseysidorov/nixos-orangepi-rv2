@@ -3,6 +3,13 @@
 final: prev: {
   makeFlashCommand = final.callPackage ./makeFlashCommand.nix { };
 
+  # The Orange Pi image only needs sing-box's VLESS/Reality functionality.
+  # Naive outbound pulls Chromium/Cronet into the riscv64 closure and is not
+  # currently cross-compilable, while Gwaihir uses the same reduced package.
+  sing-box = prev.sing-box.override {
+    withNaiveOutbound = false;
+  };
+
   # Temporary fix: xtask (used for doc generation) is built for the build platform
   # but pkg-config returns the target's pcre2 during cross-compilation, causing
   # linker errors. Disable docs when cross-compiling.
