@@ -12,6 +12,8 @@
     (modulesPath + "/installer/sd-card/sd-image.nix")
   ];
 
+  nixpkgs.hostPlatform = "riscv64-linux";
+
   boot = {
     loader.grub.enable = false;
     loader = {
