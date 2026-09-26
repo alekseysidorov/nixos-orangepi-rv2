@@ -27,5 +27,6 @@ in
 configuration.config.system.build.vm.overrideAttrs (old: {
   passthru = (old.passthru or { }) // {
     nixosConfiguration = configuration;
+    run-builder = configuration.config.system.build."run-builder";
   };
 })
