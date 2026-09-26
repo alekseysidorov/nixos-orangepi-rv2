@@ -73,6 +73,20 @@
               inputs.nix-devtools.overlays.default
             ];
           };
+          linuxBuilderRiscv64 = patchedPkgs.darwin.linux-builder.override {
+            modules = [
+              {
+                nixpkgs.buildPlatform = "aarch64-linux";
+                nixpkgs.hostPlatform = "riscv64-linux";
+
+                # The QEMU VM uses direct kernel/initrd boot. Keeping GRUB
+                # enabled pulls install-grub.pl and its cross Perl closure,
+                # including Alien-Build, which is unnecessary for a builder.
+                virtualisation.useBootLoader = false;
+                boot.loader.grub.enable = false;
+              }
+            ];
+          };
         in
         {
           # Use the common overlay in all per-system modules.
@@ -94,14 +108,7 @@
             # its guest/target tuple. The package itself remains an
             # aarch64-darwin host tool: the VM builds riscv64-linux packages
             # using an aarch64-linux build platform.
-            linux-builder-riscv64 = patchedPkgs.darwin.linux-builder.override {
-              modules = [
-                {
-                  nixpkgs.buildPlatform = "aarch64-linux";
-                  nixpkgs.hostPlatform = "riscv64-linux";
-                }
-              ];
-            };
+            linux-builder-riscv64 = linuxBuilderRiscv64;
           };
 
           # Share formatting rules between `nix fmt` and CI.
@@ -119,6 +126,13 @@
           checks = {
             # Curated list of cross-compiled packages.
             inherit (pkgs.pkgsCross.riscv64)
+              # Basic utilities
+              coreutils
+              findutils
+              grep
+              sed
+              perl
+
               # Minimal needed stuff
               nftables
               iproute2
