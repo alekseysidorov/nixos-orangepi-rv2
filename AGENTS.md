@@ -37,3 +37,8 @@ specification.
 - Describe changes in imperative mood: "fix parsing issue" not "fixed parsing
   issue".
 - Commit message title should be <= 72 characters;
+
+### Package Fixes
+
+- Put package overrides and cross-compilation fixes in `pkgs/default.nix` so
+  they are applied through the repository overlay.

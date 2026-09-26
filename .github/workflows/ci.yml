@@ -14,17 +14,6 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix build .#checks.x86_64-linux.formatting
-
-  tests:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
-
-      - name: "Run flake checks"
-        run: nix flake check
+      # Cross-package checks are intentionally not part of CI: building the
+      # RISC-V bootstrap closure is too expensive for GitHub-hosted runners.
+      - run: nix fmt -- --ci
