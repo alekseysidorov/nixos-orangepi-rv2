@@ -24,6 +24,15 @@ let
     ++ extraModules;
   };
 in
+# Keep the upstream VM derivation and add the small public API needed by
+# callers that run this builder outside nix-darwin. `nixosConfiguration`
+# exposes the evaluated guest configuration, while `run-builder` is the
+# launch wrapper from nix-builder-vm (it prepares its SSH-key directory and
+# runtime environment before starting QEMU).
+#
+# The `macos-builder-installer` name is inherited from nixpkgs: this profile
+# was originally introduced for macOS's Linux builder, but the contained
+# `run-builder` wrapper is platform-neutral and is also correct on Linux.
 configuration.config.system.build.vm.overrideAttrs (old: {
   passthru = (old.passthru or { }) // {
     nixosConfiguration = configuration;
