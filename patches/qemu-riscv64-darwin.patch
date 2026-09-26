@@ -1,0 +1,10 @@
+diff --git a/nixos/lib/qemu-common.nix b/nixos/lib/qemu-common.nix
+index 000000000000..111111111111 100644
+--- a/nixos/lib/qemu-common.nix
++++ b/nixos/lib/qemu-common.nix
+@@ -48,6 +48,7 @@
+         aarch64-darwin = {
+           aarch64-linux = "${qemuPkg}/bin/qemu-system-aarch64 -machine virt,gic-version=2,accel=${accel "hvf"} -cpu max";
++          riscv64-linux = "${qemuPkg}/bin/qemu-system-riscv64 -machine virt";
+           inherit (otherHostGuestMatrix.x86_64-darwin) x86_64-linux;
+         };
