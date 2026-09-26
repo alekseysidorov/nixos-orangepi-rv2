@@ -89,6 +89,9 @@
 
             flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
           }
+          // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+            linux-builder-riscv64 = pkgs.linux-builder-riscv64;
+          }
           // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
             linux-builder-riscv64 = patchedPkgs.darwin.linux-builder-riscv64;
           };

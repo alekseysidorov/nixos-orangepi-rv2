@@ -3,25 +3,29 @@
 final: prev: {
   makeFlashCommand = final.callPackage ./makeFlashCommand.nix { };
 
+  linux-builder-riscv64 = final.callPackage ./linux-builder.nix { hostPlatform = "riscv64-linux"; };
+
   # Add the RISC-V Darwin builder beside the upstream Darwin builders. Keep
   # the upstream linux-builder unchanged; this is a separate target with a
   # different guest platform and boot configuration.
-  darwin = prev.darwin // final.lib.optionalAttrs final.stdenv.hostPlatform.isDarwin {
-    linux-builder-riscv64 = prev.darwin.linux-builder.override {
-      modules = [
-        {
-          nixpkgs.buildPlatform = "aarch64-linux";
-          nixpkgs.hostPlatform = "riscv64-linux";
+  darwin =
+    prev.darwin
+    // final.lib.optionalAttrs final.stdenv.hostPlatform.isDarwin {
+      linux-builder-riscv64 = prev.darwin.linux-builder.override {
+        modules = [
+          {
+            nixpkgs.buildPlatform = "aarch64-linux";
+            nixpkgs.hostPlatform = "riscv64-linux";
 
-          # The QEMU VM uses direct kernel/initrd boot. Keeping GRUB enabled
-          # pulls install-grub.pl and its cross Perl closure, including
-          # Alien-Build, which is unnecessary for a builder guest.
-          virtualisation.useBootLoader = false;
-          boot.loader.grub.enable = false;
-        }
-      ];
+            # The QEMU VM uses direct kernel/initrd boot. Keeping GRUB enabled
+            # pulls install-grub.pl and its cross Perl closure, including
+            # Alien-Build, which is unnecessary for a builder guest.
+            virtualisation.useBootLoader = false;
+            boot.loader.grub.enable = false;
+          }
+        ];
+      };
     };
-  };
 
   # The Orange Pi image only needs sing-box's VLESS/Reality functionality.
   # Naive outbound pulls Chromium/Cronet into the riscv64 closure and is not
