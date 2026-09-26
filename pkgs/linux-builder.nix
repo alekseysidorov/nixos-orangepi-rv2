@@ -26,6 +26,14 @@ let
         virtualisation.host.pkgs = pkgs;
         virtualisation.qemu.package = pkgs.qemu;
 
+        # The RISC-V `virt` machine exposes virtio devices through MMIO. The
+        # qemu-vm default uses legacy `-net nic,model=virtio`, which leaves
+        # this guest without a DHCP-capable network interface.
+        virtualisation.qemu.networkingOptions = pkgs.lib.mkForce [
+          "-device virtio-net-device,netdev=user.0"
+          ''-netdev user,id=user.0,"\${QEMU_NET_OPTS:+,\$QEMU_NET_OPTS}"''
+        ];
+
         # This is a guest image, not a bootable physical installation.
         virtualisation.useBootLoader = false;
         boot.loader.grub.enable = false;
