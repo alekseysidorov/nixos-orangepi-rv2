@@ -27,6 +27,6 @@ in
 configuration.config.system.build.vm.overrideAttrs (old: {
   passthru = (old.passthru or { }) // {
     nixosConfiguration = configuration;
-    run-builder = configuration.config.system.build.create-builder.passthru.run-builder;
+    run-builder = configuration.config.system.build.macos-builder-installer.passthru.run-builder;
   };
 })
