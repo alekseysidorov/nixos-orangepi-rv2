@@ -53,7 +53,6 @@ let
           # guest targets, which pulls a large multimedia closure into the
           # cross-built image (PulseAudio, mjpegtools, and friends).
           qemu.package = pkgs.qemu.override {
-            minimal = true;
             hostCpuTargets = [ "riscv64-softmmu" ];
           };
           # The RISC-V `virt` machine exposes virtio devices through MMIO. The
