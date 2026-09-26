@@ -20,6 +20,11 @@ let
         nixpkgs.buildPlatform = system;
         nixpkgs.hostPlatform = hostPlatform;
 
+        # QEMU runs on the evaluator/VM host, not inside the RISC-V guest.
+        # Keep its package native to the build platform instead of
+        # cross-compiling qemu itself for RISC-V.
+        virtualisation.host.pkgs = pkgs;
+
         # This is a guest image, not a bootable physical installation.
         virtualisation.useBootLoader = false;
         boot.loader.grub.enable = false;
