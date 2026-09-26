@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   system,
   hostPlatform ? "riscv64-linux",
@@ -6,6 +7,14 @@
 }:
 
 let
+  # Keep the guest package universe derived from the requested target instead
+  # of selecting a hard-coded pkgsCross alias such as `riscv64`. This keeps
+  # `hostPlatform` authoritative when another target is added later.
+  guestPkgs = import pkgs.path {
+    localSystem = system;
+    crossSystem = hostPlatform;
+  };
+
   configuration = pkgs.nixos {
     imports = [
       (pkgs.path + "/nixos/modules/profiles/nix-builder-vm.nix")
@@ -16,26 +25,44 @@ let
         # Use the cross package set as the guest package universe. Without
         # this, qemu-vm sees the evaluator's x86_64 package set and selects
         # qemu-system-x86_64 even though hostPlatform is RISC-V.
-        nixpkgs.pkgs = pkgs.pkgsCross.riscv64;
-        nixpkgs.buildPlatform = system;
-        nixpkgs.hostPlatform = hostPlatform;
+        nixpkgs = {
+          buildPlatform = system;
+          hostPlatform = hostPlatform;
+          pkgs = guestPkgs;
+        };
 
-        # QEMU runs on the evaluator/VM host, not inside the RISC-V guest.
-        # Keep its package native to the build platform instead of
-        # cross-compiling qemu itself for RISC-V.
-        virtualisation.host.pkgs = pkgs;
-        virtualisation.qemu.package = pkgs.qemu;
+        # The builder guest has no hardware to manage. Keep the cross-compiled
+        # closure focused on SSH, Nix and the build toolchain.
+        networking = {
+          modemmanager.enable = false;
+          networkmanager.enable = false;
+        };
+        hardware = {
+          bluetooth.enable = false;
+          graphics.enable = false;
+        };
+        services.pipewire.enable = false;
 
-        # The RISC-V `virt` machine exposes virtio devices through MMIO. The
-        # qemu-vm default uses legacy `-net nic,model=virtio`, which leaves
-        # this guest without a DHCP-capable network interface.
-        virtualisation.qemu.networkingOptions = pkgs.lib.mkForce [
-          "-device virtio-net-device,netdev=user.0"
-          ''-netdev user,id=user.0''${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}''
-        ];
+        virtualisation = {
+          # QEMU runs on the evaluator/VM host, not inside the RISC-V guest.
+          # Keep its package native to the build platform instead of
+          # cross-compiling qemu itself for RISC-V.
+          host.pkgs = pkgs;
+          qemu.package = pkgs.qemu;
+          # The RISC-V `virt` machine exposes virtio devices through MMIO. The
+          # qemu-vm default uses legacy `-net nic,model=virtio`, which leaves
+          # this guest without a DHCP-capable network interface.
+          qemu.networkingOptions = pkgs.lib.mkForce [
+            "-device virtio-net-device,netdev=user.0"
+            "-netdev user,id=user.0\${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"
+          ];
+          # This is a guest image, not a bootable physical installation.
+          useBootLoader = false;
+          # The guest has its own CA bundle; Host certificate path
+          # is not valid inside the RISC-V VM.
+          useHostCerts = lib.mkForce false;
+        };
 
-        # This is a guest image, not a bootable physical installation.
-        virtualisation.useBootLoader = false;
         boot.loader.grub.enable = false;
       }
     ]
