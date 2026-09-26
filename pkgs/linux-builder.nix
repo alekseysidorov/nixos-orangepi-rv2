@@ -48,13 +48,6 @@ let
           # Keep its package native to the build platform instead of
           # cross-compiling qemu itself for RISC-V.
           host.pkgs = pkgs;
-          # The VM is headless and only starts a RISC-V system emulator. The
-          # default full QEMU package enables audio, SDL, GTK, and unrelated
-          # guest targets, which pulls a large multimedia closure into the
-          # cross-built image (PulseAudio, mjpegtools, and friends).
-          qemu.package = pkgs.qemu.override {
-            hostCpuTargets = [ "riscv64-softmmu" ];
-          };
           # The RISC-V `virt` machine exposes virtio devices through MMIO. The
           # qemu-vm default uses legacy `-net nic,model=virtio`, which leaves
           # this guest without a DHCP-capable network interface.
