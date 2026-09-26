@@ -1,10 +1,11 @@
 diff --git a/nixos/lib/qemu-common.nix b/nixos/lib/qemu-common.nix
-index 000000000000..111111111111 100644
 --- a/nixos/lib/qemu-common.nix
 +++ b/nixos/lib/qemu-common.nix
-@@ -48,6 +48,7 @@
+@@ -52,6 +52,7 @@
          aarch64-darwin = {
-           aarch64-linux = "${qemuPkg}/bin/qemu-system-aarch64 -machine virt,gic-version=2,accel=${accel "hvf"} -cpu max";
+           # Pin virt-11.0 to avoid gic-version=3 that works on MacOS 15+ only.
+           # FIXME: Revert to `virt` after minimal supported macos is 15+.
+           aarch64-linux = "${qemuPkg}/bin/qemu-system-aarch64 -machine virt-11.0,accel=${accel "hvf"} -cpu max";
 +          riscv64-linux = "${qemuPkg}/bin/qemu-system-riscv64 -machine virt";
-           inherit (otherHostGuestMatrix.x86_64-darwin) x86_64-linux;
+           x86_64-linux = "${qemuPkg}/bin/qemu-system-x86_64 -machine type=q35,accel=${accel "hvf"} -cpu max";
          };
