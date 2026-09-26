@@ -31,7 +31,7 @@ let
         # this guest without a DHCP-capable network interface.
         virtualisation.qemu.networkingOptions = pkgs.lib.mkForce [
           "-device virtio-net-device,netdev=user.0"
-          ''-netdev user,id=user.0,"\${QEMU_NET_OPTS:+,\$QEMU_NET_OPTS}"''
+          ''-netdev user,id=user.0,"''${QEMU_NET_OPTS:+,$QEMU_NET_OPTS}"''
         ];
 
         # This is a guest image, not a bootable physical installation.
