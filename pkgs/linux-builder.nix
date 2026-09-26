@@ -16,7 +16,7 @@ let
         # Use the cross package set as the guest package universe. Without
         # this, qemu-vm sees the evaluator's x86_64 package set and selects
         # qemu-system-x86_64 even though hostPlatform is RISC-V.
-        nixpkgs.pkgs = pkgs.pkgsCross.riscv64-unknown-linux-gnu;
+        nixpkgs.pkgs = pkgs.pkgsCross.riscv64;
         nixpkgs.buildPlatform = system;
         nixpkgs.hostPlatform = hostPlatform;
 
