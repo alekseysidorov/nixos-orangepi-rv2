@@ -90,10 +90,24 @@
             flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
           }
           // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+            # Linux hosts build the generic RISC-V NixOS VM directly through
+            # pkgs.nixos, so the current Linux system is its build platform.
             linux-builder-riscv64 = pkgs.linux-builder-riscv64;
           }
           // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-            linux-builder-riscv64 = patchedPkgs.darwin.linux-builder-riscv64;
+            # Darwin needs nixpkgs' macOS launcher and the local QEMU patch;
+            # keep this implementation separate from the generic Linux VM.
+            linux-builder-riscv64 = patchedPkgs.darwin.linux-builder.override {
+              modules = [
+                {
+                  nixpkgs.buildPlatform = "aarch64-linux";
+                  nixpkgs.hostPlatform = "riscv64-linux";
+
+                  virtualisation.useBootLoader = false;
+                  boot.loader.grub.enable = false;
+                }
+              ];
+            };
           };
 
           # Share formatting rules between `nix fmt` and CI.
