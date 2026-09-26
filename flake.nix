@@ -87,7 +87,7 @@
                 ];
               }).config.system.build.sdImage;
 
-            flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
+            flash-sd-image = pkgs.mkFlashCommand { sdImage = config.packages.sd-image-installer; };
           }
           // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
             # Linux hosts build the generic RISC-V NixOS VM directly through

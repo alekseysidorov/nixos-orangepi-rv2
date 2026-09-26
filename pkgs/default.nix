@@ -1,9 +1,11 @@
 # This file defines an overlay for NixOS
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev: {
-  makeFlashCommand = final.callPackage ./makeFlashCommand.nix { };
+  mkFlashCommand = final.callPackage ./mk-flash-command.nix { };
 
-  linux-builder-riscv64 = final.callPackage ./linux-builder.nix { hostPlatform = "riscv64-linux"; };
+  mkLinuxBuilder = final.callPackage ./mk-linux-builder.nix { };
+
+  linux-builder-riscv64 = final.mkLinuxBuilder { };
 
   # The Orange Pi image only needs sing-box's VLESS/Reality functionality.
   # Naive outbound pulls Chromium/Cronet into the riscv64 closure and is not

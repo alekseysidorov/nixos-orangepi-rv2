@@ -2,6 +2,7 @@
   pkgs,
   system,
   hostPlatform ? "riscv64-linux",
+  extraModules ? [ ],
 }:
 
 let
@@ -19,7 +20,8 @@ let
         virtualisation.useBootLoader = false;
         boot.loader.grub.enable = false;
       }
-    ];
+    ]
+    ++ extraModules;
   };
 in
 configuration.config.system.build.vm.overrideAttrs (old: {
