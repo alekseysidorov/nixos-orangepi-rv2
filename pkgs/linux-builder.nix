@@ -24,6 +24,7 @@ let
         # Keep its package native to the build platform instead of
         # cross-compiling qemu itself for RISC-V.
         virtualisation.host.pkgs = pkgs;
+        virtualisation.qemu.package = pkgs.qemu;
 
         # This is a guest image, not a bootable physical installation.
         virtualisation.useBootLoader = false;
