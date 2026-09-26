@@ -16,4 +16,4 @@ jobs:
 
       # Cross-package checks are intentionally not part of CI: building the
       # RISC-V bootstrap closure is too expensive for GitHub-hosted runners.
-      - run: nix fmt -- --check
+      - run: nix fmt -- --ci
