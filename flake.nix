@@ -73,20 +73,6 @@
               inputs.nix-devtools.overlays.default
             ];
           };
-          linuxBuilderRiscv64 = patchedPkgs.darwin.linux-builder.override {
-            modules = [
-              {
-                nixpkgs.buildPlatform = "aarch64-linux";
-                nixpkgs.hostPlatform = "riscv64-linux";
-
-                # The QEMU VM uses direct kernel/initrd boot. Keeping GRUB
-                # enabled pulls install-grub.pl and its cross Perl closure,
-                # including Alien-Build, which is unnecessary for a builder.
-                virtualisation.useBootLoader = false;
-                boot.loader.grub.enable = false;
-              }
-            ];
-          };
         in
         {
           # Use the common overlay in all per-system modules.
@@ -104,11 +90,7 @@
             flash-sd-image = pkgs.makeFlashCommand { sdImage = config.packages.sd-image-installer; };
           }
           // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-            # Reuse the upstream Darwin Linux builder profile and change only
-            # its guest/target tuple. The package itself remains an
-            # aarch64-darwin host tool: the VM builds riscv64-linux packages
-            # using an aarch64-linux build platform.
-            linux-builder-riscv64 = linuxBuilderRiscv64;
+            linux-builder-riscv64 = patchedPkgs.darwin.linux-builder-riscv64;
           };
 
           # Share formatting rules between `nix fmt` and CI.
@@ -129,8 +111,6 @@
               # Basic utilities
               coreutils
               findutils
-              grep
-              sed
               perl
 
               # Minimal needed stuff
@@ -139,12 +119,13 @@
               wireguard-tools
               curl
               openssl
-              sops
               python3
               tcpdump
               ethtool
               nmap
               tmux
+              ssh-to-age
+              rage
 
               # Some transitive stuff
               bcachefs-tools
