@@ -122,6 +122,10 @@
               # singbox-dependencies
               sing-box
               age-plugin-fido2-hmac
+
+              # Network diagnostics used on Gwaihir.
+              speedtest-rs
+              speedtest-cli
               ;
             amneziawg = pkgs.linuxPackages_testing.amneziawg;
           };
