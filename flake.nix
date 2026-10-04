@@ -121,6 +121,7 @@
 
               # singbox-dependencies
               sing-box
+              age-plugin-fido2-hmac
               ;
             amneziawg = pkgs.linuxPackages_testing.amneziawg;
           };
