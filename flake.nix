@@ -67,7 +67,7 @@
           # Expose build artifacts and project commands through `nix build` / `nix run`.
           packages = {
             sd-image-installer =
-              (pkgs.nixos {
+              (pkgs.pkgsCross.riscv64.nixos {
                 imports = [
                   ./sd-image-installer.nix
                 ];
