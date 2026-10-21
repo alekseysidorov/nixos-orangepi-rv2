@@ -127,7 +127,7 @@
               speedtest-rs
               speedtest-cli
               ;
-            amneziawg = pkgs.linuxPackages_testing.amneziawg;
+            amneziawg = pkgs.linuxPackages_latest.amneziawg;
           };
 
           # Install explicitly with `nix run .#install-git-hooks`.
