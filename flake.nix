@@ -111,8 +111,6 @@
               rage
 
               # Some transitive stuff
-              bcachefs-tools
-
               # Other packages for convenient development.
               fish
               nushell
