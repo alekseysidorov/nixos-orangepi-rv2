@@ -2,6 +2,15 @@
 # When imported, it extends nixpkgs with the packages from this repository
 final: prev: {
   mkFlashCommand = final.callPackage ./mk-flash-command.nix { };
+  # This adds the native compiler needed by Go generators in cross builds.
+  coredns-nftsync = final.callPackage ./coredns-nftsync/package.nix {
+    coredns = prev.coredns.overrideAttrs (old: {
+      nativeBuildInputs = old.nativeBuildInputs ++ [ final.buildPackages.stdenv.cc ];
+      preBuild = (old.preBuild or "") + ''
+        export PATH=${final.buildPackages.stdenv.cc}/bin:$PATH
+      '';
+    });
+  };
   # The Orange Pi image only needs sing-box's VLESS/Reality functionality.
   # Naive outbound pulls Chromium/Cronet into the riscv64 closure and is not
   # currently cross-compilable, while Gwaihir uses the same reduced package.
@@ -17,5 +26,13 @@ final: prev: {
       ++ final.lib.optionals (final.stdenv.hostPlatform != final.stdenv.buildPlatform) [
         (final.lib.cmakeBool "WITH_DOCS" false)
       ];
+  });
+  # `go generate` builds a native Go helper during cross compilation. It
+  # needs the build-platform compiler available on PATH for runtime/cgo.
+  git-lfs = prev.git-lfs.overrideAttrs (old: {
+    nativeBuildInputs = old.nativeBuildInputs ++ [ final.buildPackages.stdenv.cc ];
+    preBuild = (old.preBuild or "") + ''
+      export PATH=${final.buildPackages.stdenv.cc}/bin:$PATH
+    '';
   });
 }
